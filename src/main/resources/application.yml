@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smallcase
+    username: postgres
+
+  jpa:
+    show-sql: true
+    properties: ## Hibernate Properties # The SQL dialect makes Hibernate generate better SQL for the chosen database
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: update # Hibernate ddl auto (create, create-drop, validate, update)
