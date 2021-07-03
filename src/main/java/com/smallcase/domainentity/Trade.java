@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
+import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.dto.TradeInfo;
+import com.smallcase.enums.SecurityType;
 import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
@@ -15,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -70,6 +73,20 @@ public class Trade {
         this.tradeType = trade.getTradeType();
         this.quantity = trade.getQuantity();
         this.price = trade.getPrice();
+    }
+
+    public Trade(TradeEntity tradeEntity) {
+        Security security1 = new Security(tradeEntity.getSecurityId(), SecurityType.getEnum(tradeEntity.getSecurityType()));
+
+        this.tradeId = tradeEntity.getId();
+        this.tradeType = TradeType.getEnum(tradeEntity.getTradeType());
+        this.userId = tradeEntity.getUserId();
+        this.security = security1;
+        this.quantity = tradeEntity.getQuantity();
+        this.price = tradeEntity.getPrice();
+        this.createdAt = tradeEntity.getCreatedAt();
+        this.deletedAt = tradeEntity.getDeletedAt();
+        this.updatedAt = tradeEntity.getUpdatedAt();
     }
 
     public void addTrade(TradeHelper tradeHelper) throws FatalCustomException {

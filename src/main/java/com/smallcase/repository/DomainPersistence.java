@@ -13,5 +13,5 @@ public interface DomainPersistence<T> {
 
     T update(T t);
 
-    List<T> bulkGet(Long userId, Security security, List<T> objects);
+    List<T> bulkGet(Long userId, List<T> objects);
 }

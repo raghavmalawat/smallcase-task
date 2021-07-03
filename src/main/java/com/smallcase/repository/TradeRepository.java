@@ -6,8 +6,10 @@ import com.smallcase.domainentity.Security;
 import com.smallcase.domainentity.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TradeRepository implements DomainPersistence<Trade> {
@@ -24,7 +26,8 @@ public class TradeRepository implements DomainPersistence<Trade> {
 
     @Override
     public Trade get(Trade trade) {
-        return null;
+        Optional<TradeEntity> tradeFromDB = tradeDao.findByIdAndDeletedAt(trade.getTradeId(), 0);
+        return tradeFromDB.map(Trade::new).orElse(null);
     }
 
     @Override
@@ -38,8 +41,20 @@ public class TradeRepository implements DomainPersistence<Trade> {
     }
 
     @Override
-    public List<Trade> bulkGet(Long userId, Security security, List<Trade> trades) {
-        return null;
+    public List<Trade> bulkGet(Long userId, List<Trade> trades) {
+        List<Trade> filteredResult = new ArrayList<>();
+        List<Long> tradeIds = trades.stream().map(Trade::getTradeId).collect(Collectors.toList());
+        List<TradeEntity> tradesFromDB;
+
+        if (CollectionUtils.isEmpty(tradeIds))
+            tradesFromDB = tradeDao.findAllByUserIdAndDeletedAt(userId, 0);
+        else
+            tradesFromDB = tradeDao.findAllByIdInAndDeletedAt(tradeIds, 0);
+
+        if (Objects.nonNull(tradesFromDB))
+            filteredResult = tradesFromDB.stream().map(Trade::new).collect(Collectors.toList());
+
+        return filteredResult;
     }
 
 

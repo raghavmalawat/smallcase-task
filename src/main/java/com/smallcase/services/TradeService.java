@@ -62,21 +62,20 @@ public class TradeService {
         }
     }
 
-    public FetchTradeResponse getTradeRecords(Long userId, Long securityId, SecurityType securityType, TradeType tradeType, List<Long> tradeIds) {
-        Security security = new Security(securityId, securityType);
+    public FetchTradeResponse getTradeRecords(Long userId, List<Long> tradeIds) {
         List<Trade> tradeList = new ArrayList<>();
 
         if (Objects.nonNull(tradeIds) && tradeIds.size() == 1) {
-            Trade trade = new Trade(TradeInfo.builder().tradeId(tradeIds.get(0)).build(), userId, security);
+            Trade trade = new Trade(TradeInfo.builder().tradeId(tradeIds.get(0)).build(), userId, null);
             trade = tradeHelper.getTradeRepository().get(trade);
             tradeList.add(trade);
         } else {
             List<TradeInfo> tradeInfoList = new ArrayList<>();
             if (Objects.nonNull(tradeIds))
-                tradeInfoList = tradeIds.stream().map(u -> TradeInfo.builder().tradeId(u).tradeType(tradeType).build()).collect(Collectors.toList());
+                tradeInfoList = tradeIds.stream().map(u -> TradeInfo.builder().tradeId(u).build()).collect(Collectors.toList());
 
-            List<Trade> trades = tradeDTOToTradeTransformer.transformObject(TradeDTO.builder().security(security).userId(userId).trades(tradeInfoList).build());
-            tradeList.addAll(tradeHelper.getTradeRepository().bulkGet(userId, security, trades));
+            List<Trade> trades = tradeDTOToTradeTransformer.transformObject(TradeDTO.builder().userId(userId).trades(tradeInfoList).build());
+            tradeList.addAll(tradeHelper.getTradeRepository().bulkGet(userId, trades));
         }
 
         FetchTradeResponse response = FetchTradeResponse.builder().userId(userId).instruments(new ArrayList<>()).build();

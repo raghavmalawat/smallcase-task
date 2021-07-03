@@ -29,13 +29,10 @@ public class TradeController {
 
     @GetMapping(produces = "application/json")
     public FetchTradeResponse getTrades(@RequestParam(value = "userId") Long userId,
-                                        @RequestParam(value = "securityId", required = false) Long securityId,
-                                        @RequestParam(value = "securityType", required = false) SecurityType securityType,
-                                        @RequestParam(value = "tradeType", required = false) TradeType tradeType,
                                         @RequestParam(value = "tradeIds", required = false) List<Long> tradeIds) {
 
         try {
-            return tradeService.getTradeRecords(userId, securityId, securityType, tradeType, tradeIds);
+            return tradeService.getTradeRecords(userId, tradeIds);
         } catch (Exception e) {
             return FetchTradeResponse.builder().message("Error").success(false).build();
         }
