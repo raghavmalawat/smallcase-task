@@ -1,5 +1,9 @@
 package com.smallcase.repository;
 
+import com.smallcase.domainentity.Security;
+
+import java.util.List;
+
 public interface DomainPersistence<T> {
     Object add(T t);
 
@@ -8,4 +12,6 @@ public interface DomainPersistence<T> {
     void delete(T t);
 
     T update(T t);
+
+    List<T> bulkGet(Long userId, List<T> objects);
 }
