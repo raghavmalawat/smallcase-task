@@ -1,12 +1,9 @@
 package com.smallcase.services;
 
-import com.smallcase.domainentity.Security;
 import com.smallcase.domainentity.Trade;
 import com.smallcase.dto.FetchTradeResponse;
 import com.smallcase.dto.TradeDTO;
 import com.smallcase.dto.TradeInfo;
-import com.smallcase.enums.SecurityType;
-import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
 import com.smallcase.transformer.TradeDTOToTradeTransformer;
@@ -92,7 +89,28 @@ public class TradeService {
     }
 
     public TradeDTO updateTradeRecord(TradeDTO tradeDTO) {
-        return null;
+        try {
+            if (!tradeHelper.getTradeDTOValidator().validate(tradeDTO))
+                throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_DTO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_DTO_INVALID.getType());
+            if (CollectionUtils.isNotEmpty(tradeDTO.getTrades())) {
+                List<Trade> tradeList = tradeDTOToTradeTransformer.transformObject(tradeDTO);
+
+                if (CollectionUtils.isNotEmpty(tradeList)) {
+                    for (Trade trade : tradeList)
+                        trade.updateTrade(tradeHelper);
+                }
+                TradeDTO response = tradeToTradeDTOTransformer.transformObject(tradeList);
+                response.setSuccess(Boolean.TRUE);
+                response.setMessage("Success");
+                return response;
+            } else {
+                tradeDTO.setSuccess(Boolean.TRUE);
+                tradeDTO.setMessage("Success");
+            }
+            return tradeDTO;
+        } catch (FatalCustomException e) {
+            return TradeDTO.builder().success(Boolean.FALSE).message(e.getMessage()).build();
+        }
     }
 
     public TradeDTO deleteTradeRecord(TradeDTO tradeDTO) {

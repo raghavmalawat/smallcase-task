@@ -2,13 +2,15 @@ package com.smallcase.repository;
 
 import com.smallcase.database.postgres.dao.TradeDao;
 import com.smallcase.database.postgres.entity.TradeEntity;
-import com.smallcase.domainentity.Security;
 import com.smallcase.domainentity.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +38,9 @@ public class TradeRepository implements DomainPersistence<Trade> {
     }
 
     @Override
-    public Trade update(Trade trade) {
-        return null;
+    public void update(Trade trade) {
+        TradeEntity tradeEntity = convertTradeToTradeEntity(trade);
+        tradeDao.save(tradeEntity);
     }
 
     @Override

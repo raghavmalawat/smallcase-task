@@ -17,8 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -99,5 +99,21 @@ public class Trade {
         this.updatedAt = currentTime;
         this.deletedAt = 0;
         this.tradeId = (Long) tradeHelper.getTradeRepository().add(this);
+    }
+
+    public void updateTrade(TradeHelper tradeHelper) throws FatalCustomException {
+        if (Objects.isNull(this.tradeId) || !tradeHelper.getTradeInfoValidator().validate(this))
+            throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_INFO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_INFO_INVALID.getType());
+
+        Trade tradeFromDB = tradeHelper.getTradeRepository().get(this);
+
+        // Do computations
+
+        this.updatedAt = tradeHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
+        this.createdAt = tradeFromDB.getCreatedAt();
+        this.deletedAt = 0;
+        this.security = tradeFromDB.getSecurity();
+
+        tradeHelper.getTradeRepository().update(this);
     }
 }
