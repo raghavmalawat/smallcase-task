@@ -30,7 +30,6 @@ public class TradeController {
     @GetMapping(produces = "application/json")
     public FetchTradeResponse getTrades(@RequestParam(value = "userId") Long userId,
                                         @RequestParam(value = "tradeIds", required = false) List<Long> tradeIds) {
-
         try {
             return tradeService.getTradeRecords(userId, tradeIds);
         } catch (Exception e) {

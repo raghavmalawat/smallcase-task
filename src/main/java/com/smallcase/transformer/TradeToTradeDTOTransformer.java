@@ -14,7 +14,11 @@ import java.util.stream.Collectors;
 public class TradeToTradeDTOTransformer implements DomainTransformer<List<Trade>, TradeDTO> {
     @Override
     public TradeDTO transformObject(List<Trade> trades) {
-        return null;
+        return TradeDTO.builder()
+                .trades(convertTradeToTradeInfo(trades))
+                .userId(trades.get(0).getUserId())
+                .security(trades.get(0).getSecurity())
+                .build();
     }
 
     @Override
