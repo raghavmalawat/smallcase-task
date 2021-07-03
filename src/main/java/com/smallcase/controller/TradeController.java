@@ -14,7 +14,7 @@ public class TradeController {
     @Autowired
     TradeService tradeService;
 
-    @PostMapping(value = "/", produces = "application/json")
+    @PostMapping(produces = "application/json")
     public TradeDTO createTrade(@RequestBody TradeDTO tradeDTO) {
         try {
             return tradeService.createTradeRecords(tradeDTO);
@@ -23,7 +23,7 @@ public class TradeController {
         }
     }
 
-    @GetMapping(value = "/", produces = "application/json")
+    @GetMapping(produces = "application/json")
     public TradeDTO getTrades() {
         try {
             return tradeService.getTradeRecords();
@@ -32,7 +32,7 @@ public class TradeController {
         }
     }
 
-    @PutMapping(value = "/", produces = "application/json")
+    @PutMapping(produces = "application/json")
     public TradeDTO updateTrade(@RequestBody @Valid TradeDTO tradeDTO) {
         try {
             return tradeService.updateTradeRecord(tradeDTO);
@@ -41,7 +41,7 @@ public class TradeController {
         }
     }
 
-    @DeleteMapping(value = "/", produces = "application/json")
+    @DeleteMapping(produces = "application/json")
     public TradeDTO deleteTrade(@RequestBody TradeDTO tradeDTO) {
         try {
             return tradeService.deleteTradeRecord(tradeDTO);

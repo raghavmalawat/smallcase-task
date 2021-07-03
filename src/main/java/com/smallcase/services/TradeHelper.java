@@ -1,6 +1,8 @@
 package com.smallcase.services;
 
 import com.smallcase.domainentity.Trade;
+import com.smallcase.dto.TradeDTO;
+import com.smallcase.repository.TradeRepository;
 import com.smallcase.utils.DateTimeUtils;
 import com.smallcase.validators.DomainValidator;
 import lombok.Getter;
@@ -17,6 +19,13 @@ public class TradeHelper {
     DomainValidator<Trade> tradeInfoValidator;
 
     @Autowired
+    @Qualifier("TradeDTOValidator")
+    DomainValidator<TradeDTO> tradeDTOValidator;
+
+    @Autowired
     DateTimeUtils dateTimeUtils;
+
+    @Autowired
+    TradeRepository tradeRepository;
 
 }

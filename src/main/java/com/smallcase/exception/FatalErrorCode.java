@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum FatalErrorCode {
 
-    ERROR_FETCHING_SOCIETY_GROUP(501, "Error fetching society group details. Please try again later"),
-    ERROR_PREMISE_DETAILS_INVALID(502, "Invalid Premise Details."),
+    ERROR_TRADE_INFO_INVALID(501, "Invalid Trade Details."),
+    ERROR_TRADE_DTO_INVALID(502, "Invalid Request"),
     ERR0R_UNKNOWN_RECORD_TYPE(503, "Invalid Record Type");
 
     private final Integer type;
