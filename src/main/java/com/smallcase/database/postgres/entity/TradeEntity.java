@@ -14,9 +14,6 @@ public class TradeEntity {
     @JsonProperty("id")
     private Long id;
 
-    @Column(name = "trade_id")
-    private Long tradeId;
-
     @Column(name = "trade_type")
     private Character tradeType;
 
