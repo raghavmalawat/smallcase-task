@@ -38,7 +38,7 @@ public class TradeController {
     }
 
     @PutMapping(produces = "application/json")
-    public TradeDTO updateTrade(@RequestBody @Valid TradeDTO tradeDTO) {
+    public TradeDTO updateTrade(@RequestBody TradeDTO tradeDTO) {
         try {
             return tradeService.updateTradeRecord(tradeDTO);
         } catch (Exception e) {

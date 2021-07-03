@@ -116,4 +116,21 @@ public class Trade {
 
         tradeHelper.getTradeRepository().update(this);
     }
+
+    public void deleteTrade(TradeHelper tradeHelper) throws FatalCustomException {
+        if (Objects.isNull(this.tradeId))
+            throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_INFO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_INFO_INVALID.getType());
+
+        Trade tradeFromDB = tradeHelper.getTradeRepository().get(this);
+
+        // Do computations
+        Integer currentTime = tradeHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
+
+        this.updatedAt = currentTime;
+        this.deletedAt = currentTime;
+        this.createdAt = tradeFromDB.getCreatedAt();
+        this.security = tradeFromDB.getSecurity();
+
+        tradeHelper.getTradeRepository().update(this);
+    }
 }

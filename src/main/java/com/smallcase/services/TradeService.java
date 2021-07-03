@@ -114,6 +114,25 @@ public class TradeService {
     }
 
     public TradeDTO deleteTradeRecord(TradeDTO tradeDTO) {
-        return null;
+        try {
+           if (CollectionUtils.isNotEmpty(tradeDTO.getTrades())) {
+                List<Trade> tradeList = tradeDTOToTradeTransformer.transformObject(tradeDTO);
+
+                if (CollectionUtils.isNotEmpty(tradeList)) {
+                    for (Trade trade : tradeList)
+                        trade.deleteTrade(tradeHelper);
+                }
+                TradeDTO response = tradeToTradeDTOTransformer.transformObject(tradeList);
+                response.setSuccess(Boolean.TRUE);
+                response.setMessage("Success");
+                return response;
+            } else {
+                tradeDTO.setSuccess(Boolean.TRUE);
+                tradeDTO.setMessage("Success");
+            }
+            return tradeDTO;
+        } catch (FatalCustomException e) {
+            return TradeDTO.builder().success(Boolean.FALSE).message(e.getMessage()).build();
+        }
     }
 }
