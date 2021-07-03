@@ -1,11 +1,15 @@
 package com.smallcase.controller;
 
+import com.smallcase.dto.FetchTradeResponse;
 import com.smallcase.dto.TradeDTO;
+import com.smallcase.enums.SecurityType;
+import com.smallcase.enums.TradeType;
 import com.smallcase.services.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/trades")
@@ -24,11 +28,16 @@ public class TradeController {
     }
 
     @GetMapping(produces = "application/json")
-    public TradeDTO getTrades() {
+    public FetchTradeResponse getTrades(@RequestParam(value = "userId") Long userId,
+                                        @RequestParam(value = "securityId", required = false) Long securityId,
+                                        @RequestParam(value = "securityType", required = false) SecurityType securityType,
+                                        @RequestParam(value = "tradeType", required = false) TradeType tradeType,
+                                        @RequestParam(value = "tradeIds", required = false) List<Long> tradeIds) {
+
         try {
-            return tradeService.getTradeRecords();
+            return tradeService.getTradeRecords(userId, securityId, securityType, tradeType, tradeIds);
         } catch (Exception e) {
-            return TradeDTO.builder().message("Error").success(false).build();
+            return FetchTradeResponse.builder().message("Error").success(false).build();
         }
     }
 

@@ -2,9 +2,12 @@ package com.smallcase.repository;
 
 import com.smallcase.database.postgres.dao.TradeDao;
 import com.smallcase.database.postgres.entity.TradeEntity;
+import com.smallcase.domainentity.Security;
 import com.smallcase.domainentity.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TradeRepository implements DomainPersistence<Trade> {
@@ -31,6 +34,11 @@ public class TradeRepository implements DomainPersistence<Trade> {
 
     @Override
     public Trade update(Trade trade) {
+        return null;
+    }
+
+    @Override
+    public List<Trade> bulkGet(Long userId, Security security, List<Trade> trades) {
         return null;
     }
 
