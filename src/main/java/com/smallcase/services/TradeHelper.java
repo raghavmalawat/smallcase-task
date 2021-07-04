@@ -28,4 +28,7 @@ public class TradeHelper {
     @Autowired
     TradeRepository tradeRepository;
 
+    @Autowired
+    UserSecurityService userSecurityService;
+
 }

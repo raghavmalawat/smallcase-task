@@ -93,6 +93,11 @@ public class Trade {
         if (!tradeHelper.getTradeInfoValidator().validate(this))
             throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_INFO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_INFO_INVALID.getType());
 
+        Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().upsertUserSecurity(this);
+
+        if (tradeExecutionPossible.equals(Boolean.FALSE))
+            throw new FatalCustomException(FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getCustomMessage(), FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getType());
+
         Integer currentTime = tradeHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
         
         this.createdAt = currentTime;

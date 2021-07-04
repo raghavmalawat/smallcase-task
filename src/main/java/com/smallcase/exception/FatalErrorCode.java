@@ -7,7 +7,8 @@ public enum FatalErrorCode {
 
     ERROR_TRADE_INFO_INVALID(501, "Invalid Trade Details."),
     ERROR_TRADE_DTO_INVALID(502, "Invalid Request"),
-    ERR0R_UNKNOWN_RECORD_TYPE(503, "Invalid Record Type");
+    ERR0R_TRADE_EXECUTION_INVALID(503, "Invalid Trade Request"),
+    ERROR_TRADE_QUANTITY_INVALID(504, "Trade Quantity Invalid");
 
     private final Integer type;
     private final String customMessage;

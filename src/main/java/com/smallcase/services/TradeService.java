@@ -42,8 +42,9 @@ public class TradeService {
                 List<Trade> tradeList = tradeDTOToTradeTransformer.transformObject(tradeDTO);
 
                 if (CollectionUtils.isNotEmpty(tradeList)) {
-                    for (Trade trade : tradeList)
+                    for (Trade trade : tradeList) {
                         trade.addTrade(tradeHelper);
+                    }
                 }
                 TradeDTO response = tradeToTradeDTOTransformer.transformObject(tradeDTO, tradeList);
                 response.setSuccess(Boolean.TRUE);

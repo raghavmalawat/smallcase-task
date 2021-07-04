@@ -14,7 +14,6 @@ public class SecurityEntity {
     @JsonProperty("id")
     private Long id;
 
-    // TODO :: Generate SQL schema and create tables
     @Column(name = "security_type")
     private Character securityType;
 
