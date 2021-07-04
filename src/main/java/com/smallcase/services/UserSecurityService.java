@@ -7,13 +7,20 @@ import com.smallcase.enums.Status;
 import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
+import com.smallcase.transformer.UserSecurityToUserSecurityDTOTransformer;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
 public class UserSecurityService {
+
+    @Autowired
+    UserSecurityToUserSecurityDTOTransformer userSecurityToUserSecurityDTOTransformer;
 
     @Autowired
     UserSecurityHelper userSecurityHelper;
@@ -66,5 +73,20 @@ public class UserSecurityService {
 
     public void addUserSecurity() {
 
+    }
+
+    public UserSecurityDTO getUserSecurities(Long userId) {
+        List<UserSecurity> userSecurityList = new ArrayList<>(userSecurityHelper.getUserSecurityRepository().bulkGet(userId, new ArrayList<>()));
+        UserSecurityDTO response = UserSecurityDTO.builder().userId(userId).instruments(new ArrayList<>()).build();
+
+        if (CollectionUtils.isEmpty(userSecurityList)) {
+            response.setMessage("No Securities Found");
+            response.setSuccess(Boolean.FALSE);
+            return response;
+        }
+        response = userSecurityToUserSecurityDTOTransformer.transformObject(response, userSecurityList);
+        response.setMessage("Success");
+        response.setSuccess(Boolean.TRUE);
+        return response;
     }
 }

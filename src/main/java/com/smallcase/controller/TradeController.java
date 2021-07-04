@@ -2,13 +2,10 @@ package com.smallcase.controller;
 
 import com.smallcase.dto.FetchTradeResponse;
 import com.smallcase.dto.TradeDTO;
-import com.smallcase.enums.SecurityType;
-import com.smallcase.enums.TradeType;
 import com.smallcase.services.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController

@@ -1,13 +1,20 @@
 package com.smallcase.repository;
 
 import com.smallcase.database.postgres.dao.UserSecurityDao;
+import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.database.postgres.entity.UserSecurityEntity;
+import com.smallcase.domainentity.Trade;
 import com.smallcase.domainentity.UserSecurity;
+import com.smallcase.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserSecurityRepository implements DomainPersistence<UserSecurity> {
@@ -41,8 +48,17 @@ public class UserSecurityRepository implements DomainPersistence<UserSecurity> {
     }
 
     @Override
-    public List<UserSecurity> bulkGet(Long userId, List<UserSecurity> objects) {
-        return null;
+    public List<UserSecurity> bulkGet(Long userId, List<UserSecurity> userSecurities) {
+        List<UserSecurity> filteredResult = new ArrayList<>();
+        List<UserSecurityEntity> userSecuritiesFromDB = null;
+
+        if (CollectionUtils.isEmpty(userSecurities))
+            userSecuritiesFromDB = userSecurityDao.findAllByUserIdAndStatus(userId, Status.ACTIVE.getType());
+
+        if (Objects.nonNull(userSecuritiesFromDB))
+            filteredResult = userSecuritiesFromDB.stream().map(UserSecurity::new).collect(Collectors.toList());
+
+        return filteredResult;
     }
 
     private UserSecurityEntity convertUserSecurityToUserSecurityEntity(UserSecurity userSecurity) {
