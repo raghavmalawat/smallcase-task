@@ -82,13 +82,13 @@ public class UserSecurity {
         this.updatedAt = userSecurityEntity.getUpdatedAt();
     }
 
-    public UserSecurity(Long currentQuantity, Double averagePrice, UserSecurity userSecurityFromDB) {
+    public UserSecurity(Long currentQuantity, Double averagePrice, Status status, UserSecurity userSecurityFromDB) {
         this.currentQuantity = currentQuantity;
         this.averagePrice = averagePrice;
 
         this.userSecurityId = userSecurityFromDB.userSecurityId;
         this.userId = userSecurityFromDB.userId;
-        this.status = Status.ACTIVE;
+        this.status = status;
         this.security = userSecurityFromDB.security;
         this.createdAt = userSecurityFromDB.createdAt;
         this.updatedAt = userSecurityFromDB.updatedAt;
