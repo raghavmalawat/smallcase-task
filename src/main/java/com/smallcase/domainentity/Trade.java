@@ -134,7 +134,14 @@ public class Trade {
 
         Trade tradeFromDB = tradeHelper.getTradeRepository().get(this);
 
-        // Do computations
+        if (Objects.isNull(tradeFromDB))
+            throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_ID_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_ID_INVALID.getType());
+
+        Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().deleteTradeSecurity(tradeFromDB);
+
+        if (tradeExecutionPossible.equals(Boolean.FALSE))
+            throw new FatalCustomException(FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getCustomMessage(), FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getType());
+
         Integer currentTime = tradeHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
 
         this.updatedAt = currentTime;

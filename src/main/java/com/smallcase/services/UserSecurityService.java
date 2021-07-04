@@ -4,6 +4,7 @@ import com.smallcase.domainentity.Trade;
 import com.smallcase.domainentity.UserSecurity;
 import com.smallcase.dto.UserSecurityDTO;
 import com.smallcase.enums.Status;
+import com.smallcase.enums.TradeAction;
 import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
@@ -27,8 +28,8 @@ public class UserSecurityService {
 
     public Boolean upsertUserSecurity(Trade trade) throws FatalCustomException {
         UserSecurity userSecurityFromDB = userSecurityHelper.getUserSecurityRepository().get(new UserSecurity(trade));
-        UserSecurity updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, trade, trade.getTradeType());
-
+        UserSecurity updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, trade, trade.getTradeType(), TradeAction.NORMAL);
+        // Avg Buy Price will update if BUY
         try {
             if (Objects.nonNull(userSecurityFromDB))
                 updatedObj.updateUserSecurity(userSecurityHelper, userSecurityFromDB);
@@ -46,16 +47,17 @@ public class UserSecurityService {
         UserSecurity updatedObj = null;
 
         // revert Back Trade
-        if (earlierTrade.getTradeType().equals(TradeType.BUY))
-            updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, earlierTrade, TradeType.SELL);
-        else if (earlierTrade.getTradeType().equals(TradeType.SELL))
-            updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, earlierTrade, TradeType.BUY);
+        if (earlierTrade.getTradeType().equals(TradeType.BUY)) // this will update the avg buy price
+            updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, earlierTrade, TradeType.SELL, TradeAction.REVERT);
+        else if (earlierTrade.getTradeType().equals(TradeType.SELL)) // this will just add the quantity
+            updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, earlierTrade, TradeType.BUY, TradeAction.REVERT);
 
         // Update new Trade
-        if (trade.getTradeType().equals(TradeType.BUY))
-            updatedObj = calculateLatestAverageAndQuantity(updatedObj, trade, TradeType.BUY);
-        else if (trade.getTradeType().equals(TradeType.SELL))
-            updatedObj = calculateLatestAverageAndQuantity(updatedObj, trade, TradeType.SELL);
+        updatedObj = calculateLatestAverageAndQuantity(updatedObj, trade, trade.getTradeType(), TradeAction.NORMAL);
+
+
+        if (updatedObj.getCurrentQuantity() < 0)
+            throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_REVERT_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_REVERT_INVALID.getType());
 
         try {
             if (Objects.nonNull(updatedObj)) {
@@ -68,32 +70,69 @@ public class UserSecurityService {
         }
     }
 
-    private UserSecurity calculateLatestAverageAndQuantity(UserSecurity userSecurityFromDB, Trade trade, TradeType tradeType) throws FatalCustomException {
+    public Boolean deleteTradeSecurity(Trade trade) throws FatalCustomException {
+        UserSecurity userSecurityFromDB = userSecurityHelper.getUserSecurityRepository().get(new UserSecurity(trade));
+        UserSecurity updatedObj = null;
+
+        if (trade.getTradeType().equals(TradeType.BUY))
+            updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, trade, TradeType.SELL, TradeAction.REVERT);
+        else if (trade.getTradeType().equals(TradeType.SELL))
+            updatedObj = calculateLatestAverageAndQuantity(userSecurityFromDB, trade, TradeType.BUY, TradeAction.REVERT);
+
+        try {
+            if (Objects.nonNull(updatedObj)) {
+
+                if (updatedObj.getCurrentQuantity() < 0)
+                    throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_REVERT_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_REVERT_INVALID.getType());
+
+                updatedObj.updateUserSecurity(userSecurityHelper, userSecurityFromDB);
+                return Boolean.TRUE;
+            }
+            return Boolean.FALSE;
+        } catch (Exception e) {
+            return Boolean.FALSE;
+        }
+    }
+
+    private UserSecurity calculateLatestAverageAndQuantity(UserSecurity userSecurityFromDB, Trade trade, TradeType tradeType, TradeAction tradeAction) throws FatalCustomException {
         Long currentQuantity = 0L;
-        Double averagePrice;
+        Double averagePrice = 0.0;
         Double totalPrice = 0.0;
 
-        if (Objects.nonNull(userSecurityFromDB) && userSecurityFromDB.getStatus().equals(Status.ACTIVE)) {
+        if (Objects.nonNull(userSecurityFromDB)) {
             currentQuantity = userSecurityFromDB.getCurrentQuantity();
             averagePrice = userSecurityFromDB.getAveragePrice();
             totalPrice = currentQuantity * averagePrice;
         }
 
         if (tradeType.equals(TradeType.BUY)) {
-            totalPrice = totalPrice + (trade.getPrice() * trade.getQuantity());
-            currentQuantity = currentQuantity + trade.getQuantity();
+            if (tradeAction.equals(TradeAction.REVERT)) {
+                currentQuantity = currentQuantity + trade.getQuantity();
+            } else {
+                totalPrice = totalPrice + (trade.getPrice() * trade.getQuantity());
+                currentQuantity = currentQuantity + trade.getQuantity();
+                averagePrice = totalPrice / currentQuantity;
+            }
         } else {
-            if (trade.getQuantity() > currentQuantity)
-                    throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_QUANTITY_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_QUANTITY_INVALID.getType());
-            totalPrice = totalPrice - (trade.getPrice() * trade.getQuantity());
-            currentQuantity = currentQuantity - trade.getQuantity();
-        }
+            if (tradeAction.equals(TradeAction.REVERT)) {
+                currentQuantity = currentQuantity - trade.getQuantity();
 
-        if (currentQuantity > 0)
-            averagePrice = totalPrice / currentQuantity;
-        else {
-            averagePrice = 0.0;
-            currentQuantity = 0L;
+//                if (currentQuantity < 0)
+//                    throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_REVERT_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_REVERT_INVALID.getType());
+
+                totalPrice = totalPrice - (trade.getPrice() * trade.getQuantity());
+
+                if (currentQuantity > 0)
+                    averagePrice = totalPrice / currentQuantity;
+                else {
+                    averagePrice = 0.0;
+                    currentQuantity = 0L;
+                }
+            } else {
+                if (trade.getQuantity() > currentQuantity)
+                    throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_QUANTITY_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_QUANTITY_INVALID.getType());
+                currentQuantity = currentQuantity - trade.getQuantity();
+            }
         }
 
         if (Objects.isNull(userSecurityFromDB) && (currentQuantity > 0))
@@ -105,10 +144,6 @@ public class UserSecurityService {
             return new UserSecurity(currentQuantity, averagePrice, Status.INACTIVE, userSecurityFromDB);
     }
 
-
-    public void addUserSecurity() {
-
-    }
 
     public UserSecurityDTO getUserSecurities(Long userId) {
         List<UserSecurity> userSecurityList = new ArrayList<>(userSecurityHelper.getUserSecurityRepository().bulkGet(userId, new ArrayList<>()));

@@ -9,7 +9,8 @@ public enum FatalErrorCode {
     ERROR_TRADE_DTO_INVALID(502, "Invalid Request"),
     ERR0R_TRADE_EXECUTION_INVALID(503, "Invalid Trade Request"),
     ERROR_TRADE_QUANTITY_INVALID(504, "Trade Quantity Invalid"),
-    ERROR_TRADE_ID_INVALID(504, "no Trade exists with the trade Id");
+    ERROR_TRADE_ID_INVALID(505, "No Trade exists with the trade Id"),
+    ERROR_TRADE_REVERT_INVALID(506, "Trade revert not possible");
 
     private final Integer type;
     private final String customMessage;
