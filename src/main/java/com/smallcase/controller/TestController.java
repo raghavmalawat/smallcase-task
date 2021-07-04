@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TestController {
-
+    // TODO : Add swagger
+    // TODO : Add Comments
+    // TODO : Prepare a documentation
     @RequestMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public String index() {
