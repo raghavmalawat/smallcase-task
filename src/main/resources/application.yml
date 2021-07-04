@@ -1,3 +1,8 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /smallcase-core
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/smallcase
