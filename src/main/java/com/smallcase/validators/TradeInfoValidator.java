@@ -11,6 +11,6 @@ public class TradeInfoValidator implements DomainValidator<Trade> {
 
     @Override
     public boolean validate(Trade trade) throws FatalCustomException {
-        return (trade.getQuantity() >= 0) && (trade.getPrice() >= 0.0);
+        return (trade.getQuantity() > 0) && (trade.getPrice() >= 0.0);
     }
 }
