@@ -2,6 +2,7 @@ package com.smallcase.services;
 
 import com.smallcase.domainentity.Trade;
 import com.smallcase.domainentity.UserSecurity;
+import com.smallcase.dto.UserInstrument;
 import com.smallcase.dto.UserSecurityDTO;
 import com.smallcase.enums.Status;
 import com.smallcase.enums.TradeAction;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class UserSecurityService {
@@ -160,4 +162,37 @@ public class UserSecurityService {
         return response;
     }
 
+    public UserSecurityDTO getPortfolioReturns(Long userId) {
+        List<UserSecurity> userSecurityList = new ArrayList<>(userSecurityHelper.getUserSecurityRepository().bulkGet(userId, new ArrayList<>()));
+        UserSecurityDTO response = UserSecurityDTO.builder().userId(userId).instruments(new ArrayList<>()).build();
+
+        if (CollectionUtils.isEmpty(userSecurityList)) {
+            response.setMessage("No Securities Found, Returns cannot be generated");
+            response.setSuccess(Boolean.FALSE);
+            return response;
+        }
+
+        userSecurityList.forEach(UserSecurity::getSecurityReturns);
+        response = userSecurityToUserSecurityDTOTransformer.transformObject(response, userSecurityList);
+
+        response.setTotalReturns(calculateCumulativeReturns(response.getInstruments()));
+
+        response.setMessage("Success");
+        response.setSuccess(Boolean.TRUE);
+        return response;
+    }
+
+    private Double calculateCumulativeReturns(List<UserInstrument> instruments) {
+        AtomicReference<Double> cumulativeReturns = new AtomicReference<>(0.0);
+
+        instruments.forEach(userInstrument -> {
+            AtomicReference<Double> cumulativeReturnsByType = new AtomicReference<>(0.0);
+
+            userInstrument.getUserSecurities().forEach(userSecurityInfo -> cumulativeReturnsByType.updateAndGet(v -> v + userSecurityInfo.getCumulativeReturns()));
+
+            cumulativeReturns.set(cumulativeReturns.get() + cumulativeReturnsByType.get());
+            userInstrument.setCumulativeReturns(cumulativeReturnsByType.get());
+        });
+        return cumulativeReturns.get();
+    }
 }

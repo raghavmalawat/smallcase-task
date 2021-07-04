@@ -27,7 +27,7 @@ public class PortfolioController {
     @GetMapping(value = "/returns", produces = "application/json")
     public UserSecurityDTO getUserPortfolioReturns(@RequestParam(value = "userId") Long userId) {
         try {
-            return userSecurityService.getUserSecurities(userId);
+            return userSecurityService.getPortfolioReturns(userId);
         } catch (Exception e) {
             return UserSecurityDTO.builder().message("Error").success(false).build();
         }

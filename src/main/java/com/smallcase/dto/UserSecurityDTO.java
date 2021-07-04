@@ -33,6 +33,10 @@ public class UserSecurityDTO {
     @NotNull
     Long userId;
 
+    @JsonProperty("total_returns")
+    @SerializedName("total_returns")
+    Double totalReturns;
+
     @JsonProperty("instruments")
     @SerializedName("instruments")
     @NotNull

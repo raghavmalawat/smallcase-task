@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +25,6 @@ public class UserSecurityToUserSecurityDTOTransformer implements DomainTransform
 
         for (SecurityType securityType: SecurityType.values()) {
             List<UserSecurity> filteredSecuritiesList = userSecurities.stream().filter(u -> u.getSecurity().getSecurityType().equals(securityType)).collect(Collectors.toList());
-
             userInstruments.add(UserInstrument.builder().securityType(securityType).userSecurities(convertUserSecurityToUserSecurityInfo(filteredSecuritiesList)).build());
         }
         return UserSecurityDTO.builder()
@@ -34,12 +34,18 @@ public class UserSecurityToUserSecurityDTOTransformer implements DomainTransform
     }
 
     private List<UserSecurityInfo> convertUserSecurityToUserSecurityInfo(List<UserSecurity> filteredSecuritiesList) {
-        return filteredSecuritiesList.stream().map(userSecurity ->
-                UserSecurityInfo.builder()
+        return filteredSecuritiesList.stream().map(userSecurity -> {
+            UserSecurityInfo userSecurityInfo = UserSecurityInfo.builder()
                     .averagePrice(userSecurity.getAveragePrice())
                     .currentQuantity(userSecurity.getCurrentQuantity())
                     .security(userSecurity.getSecurity())
-                    .build()
+                    .build();
+
+            if (Objects.nonNull(userSecurity.getCumulativeReturns()))
+                userSecurityInfo.setCumulativeReturns(userSecurity.getCumulativeReturns());
+
+            return userSecurityInfo;
+        }
         ).collect(Collectors.toList());
     }
 }

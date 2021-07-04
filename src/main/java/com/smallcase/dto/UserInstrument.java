@@ -26,6 +26,10 @@ public class UserInstrument {
     @NotNull
     SecurityType securityType;
 
+    @JsonProperty("cumulative_returns")
+    @SerializedName("cumulative_returns")
+    Double cumulativeReturns;
+
     @JsonProperty("securities")
     @SerializedName("securities")
     @NotNull

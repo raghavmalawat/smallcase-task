@@ -37,6 +37,11 @@ public class UserSecurity {
     @NotNull
     Status status;
 
+    @JsonProperty("cumulative_returns")
+    @SerializedName("cumulative_returns")
+    @NotNull
+    Double cumulativeReturns;
+
     @JsonProperty("user_id")
     @SerializedName("user_id")
     @NotNull
@@ -116,5 +121,9 @@ public class UserSecurity {
         this.security = userSecurityFromDB.getSecurity();
 
         userSecurityHelper.getUserSecurityRepository().update(this);
+    }
+
+    public void getSecurityReturns() {
+        this.cumulativeReturns = (100 - this.averagePrice) * this.currentQuantity;
     }
 }

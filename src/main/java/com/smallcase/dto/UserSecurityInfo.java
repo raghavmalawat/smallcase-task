@@ -29,6 +29,11 @@ public class UserSecurityInfo {
     @NotNull
     Security security;
 
+    @JsonProperty("cumulative_returns")
+    @SerializedName("cumulative_returns")
+    @NotNull
+    Double cumulativeReturns;
+
     @JsonProperty("current_quantity")
     @SerializedName("current_quantity")
     @NotNull
