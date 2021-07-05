@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class TestController {
-    // TODO : Prepare a documentation
-    // TODO : Add unique constraint ot ticker symbol in prod
-
     @ApiOperation(value = "Service Health Check")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = "application/json")
