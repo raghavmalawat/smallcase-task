@@ -1,9 +1,7 @@
 package com.smallcase.repository;
 
 import com.smallcase.database.postgres.dao.UserSecurityDao;
-import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.database.postgres.entity.UserSecurityEntity;
-import com.smallcase.domainentity.Trade;
 import com.smallcase.domainentity.UserSecurity;
 import com.smallcase.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;

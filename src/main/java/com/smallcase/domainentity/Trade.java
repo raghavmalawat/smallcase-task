@@ -76,6 +76,8 @@ public class Trade {
     }
 
     public Trade(TradeEntity tradeEntity) {
+        // convert the trade object obtained from DB to the domain object
+
         Security security1 = new Security(tradeEntity.getSecurityId(), SecurityType.getEnum(tradeEntity.getSecurityType()));
 
         this.tradeId = tradeEntity.getId();
@@ -93,13 +95,15 @@ public class Trade {
         if (!tradeHelper.getTradeInfoValidator().validate(this))
             throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_INFO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_INFO_INVALID.getType());
 
+        // check if the execution of trade will not break the app logic i.e not selling more than what you have, etc
         Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().upsertUserSecurity(this);
 
         if (tradeExecutionPossible.equals(Boolean.FALSE))
             throw new FatalCustomException(FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getCustomMessage(), FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getType());
 
         Integer currentTime = tradeHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
-        
+
+        // create a trade object and persist in DB as a log
         this.createdAt = currentTime;
         this.updatedAt = currentTime;
         this.deletedAt = 0;
@@ -115,6 +119,8 @@ public class Trade {
         if (Objects.isNull(tradeFromDB))
             throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_ID_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_ID_INVALID.getType());
 
+        // check if the execution of the updated trade will not break the app logic i.e not selling more than what you have, reverting th previous trades,
+        // what if some other trades were executed in the meantime and the quantity is not what is expected, etc
         Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().updateUserSecurity(this, tradeFromDB);
 
         if (tradeExecutionPossible.equals(Boolean.FALSE))
@@ -125,6 +131,7 @@ public class Trade {
         this.deletedAt = 0;
         this.security = tradeFromDB.getSecurity();
 
+        // update the trade object and persist in DB
         tradeHelper.getTradeRepository().update(this);
     }
 
@@ -137,6 +144,7 @@ public class Trade {
         if (Objects.isNull(tradeFromDB))
             throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_ID_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_ID_INVALID.getType());
 
+        // check if the execution of the updated trade will not break the app logic
         Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().deleteTradeSecurity(tradeFromDB);
 
         if (tradeExecutionPossible.equals(Boolean.FALSE))
@@ -149,6 +157,7 @@ public class Trade {
         this.createdAt = tradeFromDB.getCreatedAt();
         this.security = tradeFromDB.getSecurity();
 
+        // soft delete the trade
         tradeHelper.getTradeRepository().update(this);
     }
 }

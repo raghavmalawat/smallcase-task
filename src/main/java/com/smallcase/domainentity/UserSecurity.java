@@ -72,6 +72,8 @@ public class UserSecurity {
     }
 
     public UserSecurity(UserSecurityEntity userSecurityEntity) {
+        // convert the user security object obtained from DB to the domain object
+
         Security security1 = new Security(userSecurityEntity.getSecurityId(), SecurityType.getEnum(userSecurityEntity.getSecurityType()));
 
         this.userId = userSecurityEntity.getUserId();
@@ -104,7 +106,7 @@ public class UserSecurity {
         this.status = Status.ACTIVE;
     }
 
-    public void addUserSecurity(UserSecurityHelper userSecurityHelper) throws FatalCustomException {
+    public void addUserSecurity(UserSecurityHelper userSecurityHelper) {
         Integer currentTime = userSecurityHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
 
         this.createdAt = currentTime;
@@ -117,10 +119,12 @@ public class UserSecurity {
         this.createdAt = userSecurityFromDB.getCreatedAt();
         this.security = userSecurityFromDB.getSecurity();
 
+        // updating the user security holding in case of create, delete, update trades
         userSecurityHelper.getUserSecurityRepository().update(this);
     }
 
     public void getSecurityReturns(UserSecurityHelper userSecurityHelper) {
+        // calculate the returns for a particular security considering a fixed current price at the moment
         this.cumulativeReturns = (userSecurityHelper.getCurrentPrice() - this.averagePrice) * this.currentQuantity;
     }
 }
