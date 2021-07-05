@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class TestController {
-    // TODO : Add Comments
     // TODO : Prepare a documentation
     // TODO : Add unique constraint ot ticker symbol in prod
 

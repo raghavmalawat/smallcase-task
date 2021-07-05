@@ -5,12 +5,12 @@
     </Properties>
     <Appenders>
         <Console name="console-log" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [RID-%X{id}] [%X{api}] [TID-%tid] %c{1} %M - %msg%n"/>
+            <PatternLayout pattern="[%level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [TID-%tid] %c{1} %M - %msg%n"/>
         </Console>
         <RollingFile name="info-log" fileName="${log-path}/dev-info.log"
              filePattern="${log-path}/dev-info-%d{yyyy-MM-dd}.log">
             <PatternLayout>
-                <pattern>[%level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [RID-%X{id}] [%X{api}] [TID-%tid] %c{1} %M - %msg%n</pattern>
+                <pattern>[%level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [TID-%tid] %c{1} %M - %msg%n</pattern>
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
@@ -19,7 +19,7 @@
         <RollingFile name="error-log" fileName="${log-path}/dev-error.log"
              filePattern="${log-path}/dev-listing-error-%d{yyyy-MM-dd}.log">
             <PatternLayout>
-                <pattern>[%level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [RID-%X{id}] [%X{api}] [TID-%tid] %c{1} %M - %msg%n</pattern>
+                <pattern>[%level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [TID-%tid] %c{1} %M - %msg%n</pattern>
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>

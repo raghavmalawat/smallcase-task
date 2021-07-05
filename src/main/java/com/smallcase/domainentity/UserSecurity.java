@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
+import com.smallcase.LogFactory;
 import com.smallcase.database.postgres.entity.UserSecurityEntity;
 import com.smallcase.enums.SecurityType;
 import com.smallcase.enums.Status;
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.logging.log4j.Logger;
 
 import javax.validation.constraints.NotNull;
 
@@ -65,6 +67,8 @@ public class UserSecurity {
     @JsonIgnore
     Integer updatedAt;
 
+    private static final Logger logger = LogFactory.getLogger(UserSecurity.class);
+
     public UserSecurity(Trade trade) {
         this.userId = trade.getUserId();
         this.security = trade.getSecurity();
@@ -84,6 +88,8 @@ public class UserSecurity {
         this.averagePrice = userSecurityEntity.getAveragePrice();
         this.createdAt = userSecurityEntity.getCreatedAt();
         this.updatedAt = userSecurityEntity.getUpdatedAt();
+
+        logger.info("user security holding object from DB: {}", this);
     }
 
     public UserSecurity(Long currentQuantity, Double averagePrice, Status status, UserSecurity userSecurityFromDB) {
@@ -112,6 +118,9 @@ public class UserSecurity {
         this.createdAt = currentTime;
         this.updatedAt = currentTime;
         this.userSecurityId = (Long) userSecurityHelper.getUserSecurityRepository().add(this);
+
+        logger.info("user security with security id {} added to the system with id {}, current quantity : {}, average buy price : {}",
+                this.security.securityId, this.userSecurityId, this.currentQuantity, this.averagePrice);
     }
 
     public void updateUserSecurity(UserSecurityHelper userSecurityHelper, UserSecurity userSecurityFromDB) throws FatalCustomException {
@@ -121,6 +130,9 @@ public class UserSecurity {
 
         // updating the user security holding in case of create, delete, update trades
         userSecurityHelper.getUserSecurityRepository().update(this);
+
+        logger.info("user security with security id {} updated to the system with id {}, current quantity : {}, average buy price : {}",
+                this.security.securityId, this.userSecurityId, this.currentQuantity, this.averagePrice);
     }
 
     public void getSecurityReturns(UserSecurityHelper userSecurityHelper) {

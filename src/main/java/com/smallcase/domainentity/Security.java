@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
+import com.smallcase.LogFactory;
 import com.smallcase.database.postgres.entity.SecurityEntity;
 import com.smallcase.enums.SecurityType;
 import com.smallcase.helpers.SecurityHelper;
 import lombok.*;
+import org.apache.logging.log4j.Logger;
 
 import javax.validation.constraints.NotNull;
 
@@ -49,6 +51,8 @@ public class Security {
     @JsonIgnore
     Integer updatedAt;
 
+    private static final Logger logger = LogFactory.getLogger(Security.class);
+
     public Security(Long securityId, SecurityType securityType) {
         this.securityId = securityId;
         this.securityType = securityType;
@@ -68,6 +72,8 @@ public class Security {
         this.createdAt = securityEntity.getCreatedAt();
         this.deletedAt = securityEntity.getDeletedAt();
         this.updatedAt = securityEntity.getUpdatedAt();
+
+        logger.info("security object from DB: {} for id {}", this, this.securityId);
     }
 
     public void addSecurity(SecurityHelper securityHelper) {
@@ -78,5 +84,6 @@ public class Security {
         this.updatedAt = currentTime;
         this.deletedAt = 0;
         this.securityId = (Long) securityHelper.getSecurityRepository().add(this);
+        logger.info("security with ticker symbol {} added to the system with id {}", this.tickerSymbol, this.securityId);
     }
 }

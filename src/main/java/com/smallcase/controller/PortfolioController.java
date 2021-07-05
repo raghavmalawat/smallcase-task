@@ -25,7 +25,10 @@ public class PortfolioController {
     @GetMapping(produces = "application/json")
     public UserSecurityDTO getUserPortfolio(@RequestParam(value = "userId") Long userId) {
         try {
-            return userSecurityService.getUserSecurities(userId);
+            logger.info("Fetch user portfolio for userId: {}", userId);
+            UserSecurityDTO response = userSecurityService.getUserSecurities(userId);
+            logger.info("Fetch user portfolio response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in fetching user portfolio: {}", ExceptionUtils.getStackTrace(e));
             return UserSecurityDTO.builder().message("Error").success(false).build();
@@ -36,7 +39,10 @@ public class PortfolioController {
     @GetMapping(value = "/returns", produces = "application/json")
     public UserSecurityDTO getUserPortfolioReturns(@RequestParam(value = "userId") Long userId) {
         try {
-            return userSecurityService.getPortfolioReturns(userId);
+            logger.info("Fetch user portfolio returns for userId: {}", userId);
+            UserSecurityDTO response = userSecurityService.getPortfolioReturns(userId);
+            logger.info("Fetch user portfolio returns response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in fetching user portfolio returns: {}", ExceptionUtils.getStackTrace(e));
             return UserSecurityDTO.builder().message("Error").success(false).build();
