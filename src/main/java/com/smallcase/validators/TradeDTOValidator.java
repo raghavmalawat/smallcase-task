@@ -10,6 +10,11 @@ import java.util.Objects;
 @Service
 @Qualifier("TradeDTOValidator")
 public class TradeDTOValidator implements DomainValidator<TradeDTO> {
+
+    /**
+     * @param tradeDTO validates if any trade has all the required fields set
+     * @return true if validation successful else false
+     */
     @Override
     public boolean validate(TradeDTO tradeDTO) throws FatalCustomException {
         return (Objects.nonNull(tradeDTO.getUserId())

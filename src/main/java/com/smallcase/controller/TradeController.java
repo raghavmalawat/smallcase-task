@@ -1,9 +1,12 @@
 package com.smallcase.controller;
 
+import com.smallcase.LogFactory;
 import com.smallcase.dto.FetchTradeResponse;
 import com.smallcase.dto.TradeDTO;
 import com.smallcase.services.TradeService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/trades")
 public class TradeController {
+
+    private static final Logger logger = LogFactory.getLogger(TradeController.class);
 
     @Autowired
     TradeService tradeService;
@@ -22,6 +27,7 @@ public class TradeController {
         try {
             return tradeService.createTradeRecords(tradeDTO);
         } catch (Exception e) {
+            logger.error("Error in creating a new trade entry: {}", ExceptionUtils.getStackTrace(e));
             return TradeDTO.builder().message("Error").success(false).build();
         }
     }
@@ -33,6 +39,7 @@ public class TradeController {
         try {
             return tradeService.getTradeRecords(userId, tradeIds);
         } catch (Exception e) {
+            logger.error("Error in retrieving trade entries: {}", ExceptionUtils.getStackTrace(e));
             return FetchTradeResponse.builder().message("Error").success(false).build();
         }
     }
@@ -43,6 +50,7 @@ public class TradeController {
         try {
             return tradeService.updateTradeRecord(tradeDTO);
         } catch (Exception e) {
+            logger.error("Error in updating a trade entry: {}", ExceptionUtils.getStackTrace(e));
             return TradeDTO.builder().message("Error").success(false).build();
         }
     }
@@ -53,6 +61,7 @@ public class TradeController {
         try {
             return tradeService.deleteTradeRecord(tradeDTO);
         } catch (Exception e) {
+            logger.error("Error in deleting a new entry: {}", ExceptionUtils.getStackTrace(e));
             return TradeDTO.builder().message("Error").success(false).build();
         }
     }

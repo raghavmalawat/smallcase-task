@@ -2,9 +2,7 @@ package com.smallcase.repository;
 
 import com.smallcase.database.postgres.dao.SecurityDao;
 import com.smallcase.database.postgres.entity.SecurityEntity;
-import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.domainentity.Security;
-import com.smallcase.domainentity.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

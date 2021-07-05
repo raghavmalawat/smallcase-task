@@ -59,6 +59,8 @@ public class Security {
     }
 
     public Security(SecurityEntity securityEntity) {
+        // convert the security object obtained from DB to the domain object
+
         this.securityId = securityEntity.getId();
         this.securityType = SecurityType.getEnum(securityEntity.getSecurityType());
         this.securityName = securityEntity.getName();
@@ -69,6 +71,7 @@ public class Security {
     }
 
     public void addSecurity(SecurityHelper securityHelper) {
+        // create a new security object and add to the system
         Integer currentTime = securityHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
 
         this.createdAt = currentTime;

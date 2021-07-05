@@ -11,6 +11,11 @@ import java.util.Objects;
 @Service
 @Qualifier("SecurityDTOValidator")
 public class SecurityDTOValidator implements DomainValidator<SecurityDTO> {
+
+    /**
+     * @param securityDTO validate if the securities have all the required fields populated
+     * @return true if validation successful else false
+     */
     @Override
     public boolean validate(SecurityDTO securityDTO) throws FatalCustomException {
         for (Security security : securityDTO.getSecurities()) {
