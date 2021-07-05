@@ -6,6 +6,7 @@ import com.smallcase.dto.TradeDTO;
 import com.smallcase.dto.TradeInfo;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
+import com.smallcase.helpers.TradeHelper;
 import com.smallcase.transformer.TradeDTOToTradeTransformer;
 import com.smallcase.transformer.TradeToFetchTradeResponseTransformer;
 import com.smallcase.transformer.TradeToTradeDTOTransformer;

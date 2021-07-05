@@ -4,6 +4,7 @@ import com.smallcase.domainentity.Security;
 import com.smallcase.dto.SecurityDTO;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
+import com.smallcase.helpers.SecurityHelper;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

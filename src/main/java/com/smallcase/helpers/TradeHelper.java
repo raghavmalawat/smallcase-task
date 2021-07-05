@@ -1,8 +1,9 @@
-package com.smallcase.services;
+package com.smallcase.helpers;
 
 import com.smallcase.domainentity.Trade;
 import com.smallcase.dto.TradeDTO;
 import com.smallcase.repository.TradeRepository;
+import com.smallcase.services.UserSecurityService;
 import com.smallcase.utils.DateTimeUtils;
 import com.smallcase.validators.DomainValidator;
 import lombok.Getter;

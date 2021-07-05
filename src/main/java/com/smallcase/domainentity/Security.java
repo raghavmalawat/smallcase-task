@@ -7,8 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import com.smallcase.database.postgres.entity.SecurityEntity;
 import com.smallcase.enums.SecurityType;
-import com.smallcase.enums.TradeType;
-import com.smallcase.services.SecurityHelper;
+import com.smallcase.helpers.SecurityHelper;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;

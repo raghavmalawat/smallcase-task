@@ -20,7 +20,7 @@ public class SecurityEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "ticker_symbol")
+    @Column(name = "ticker_symbol", unique = true)
     private String tickerSymbol;
 
     @Column(name = "deleted_at")

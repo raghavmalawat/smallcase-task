@@ -2,7 +2,6 @@ package com.smallcase.database.postgres.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.smallcase.enums.Status;
 import lombok.Data;
 
 import javax.persistence.*;
