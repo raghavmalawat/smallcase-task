@@ -1,6 +1,5 @@
 package com.smallcase.controller;
 
-import com.smallcase.dto.TradeDTO;
 import com.smallcase.dto.UserSecurityDTO;
 import com.smallcase.services.UserSecurityService;
 import io.swagger.annotations.ApiOperation;

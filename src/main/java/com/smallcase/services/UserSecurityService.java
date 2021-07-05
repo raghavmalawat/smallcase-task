@@ -9,6 +9,7 @@ import com.smallcase.enums.TradeAction;
 import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
+import com.smallcase.helpers.UserSecurityHelper;
 import com.smallcase.transformer.UserSecurityToUserSecurityDTOTransformer;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,7 +173,7 @@ public class UserSecurityService {
             return response;
         }
 
-        userSecurityList.forEach(UserSecurity::getSecurityReturns);
+        userSecurityList.forEach(userSecurity -> userSecurity.getSecurityReturns(userSecurityHelper));
         response = userSecurityToUserSecurityDTOTransformer.transformObject(response, userSecurityList);
 
         response.setTotalReturns(calculateCumulativeReturns(response.getInstruments()));

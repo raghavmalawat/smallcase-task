@@ -9,16 +9,13 @@ import com.smallcase.database.postgres.entity.UserSecurityEntity;
 import com.smallcase.enums.SecurityType;
 import com.smallcase.enums.Status;
 import com.smallcase.exception.FatalCustomException;
-import com.smallcase.exception.FatalErrorCode;
-import com.smallcase.services.TradeHelper;
-import com.smallcase.services.UserSecurityHelper;
+import com.smallcase.helpers.UserSecurityHelper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -123,7 +120,7 @@ public class UserSecurity {
         userSecurityHelper.getUserSecurityRepository().update(this);
     }
 
-    public void getSecurityReturns() {
-        this.cumulativeReturns = (100 - this.averagePrice) * this.currentQuantity;
+    public void getSecurityReturns(UserSecurityHelper userSecurityHelper) {
+        this.cumulativeReturns = (userSecurityHelper.getCurrentPrice() - this.averagePrice) * this.currentQuantity;
     }
 }

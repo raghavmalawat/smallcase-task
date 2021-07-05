@@ -11,7 +11,7 @@ import com.smallcase.enums.SecurityType;
 import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
-import com.smallcase.services.TradeHelper;
+import com.smallcase.helpers.TradeHelper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

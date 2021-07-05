@@ -1,4 +1,4 @@
-package com.smallcase.services;
+package com.smallcase.helpers;
 
 import com.smallcase.dto.SecurityDTO;
 import com.smallcase.repository.SecurityRepository;
