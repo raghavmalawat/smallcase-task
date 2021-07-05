@@ -5,17 +5,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
+import com.smallcase.LogFactory;
 import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.dto.TradeInfo;
 import com.smallcase.enums.SecurityType;
 import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
-import com.smallcase.services.TradeHelper;
+import com.smallcase.helpers.TradeHelper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.logging.log4j.Logger;
 
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -66,6 +68,8 @@ public class Trade {
     @JsonIgnore
     Integer updatedAt;
 
+    private static final Logger logger = LogFactory.getLogger(Trade.class);
+
     public Trade(TradeInfo trade, Long userId, Security security) {
         this.security = security;
         this.userId = userId;
@@ -76,6 +80,8 @@ public class Trade {
     }
 
     public Trade(TradeEntity tradeEntity) {
+        // convert the trade object obtained from DB to the domain object
+
         Security security1 = new Security(tradeEntity.getSecurityId(), SecurityType.getEnum(tradeEntity.getSecurityType()));
 
         this.tradeId = tradeEntity.getId();
@@ -87,23 +93,30 @@ public class Trade {
         this.createdAt = tradeEntity.getCreatedAt();
         this.deletedAt = tradeEntity.getDeletedAt();
         this.updatedAt = tradeEntity.getUpdatedAt();
+
+        logger.info("Trade object from DB: {}", this);
     }
 
     public void addTrade(TradeHelper tradeHelper) throws FatalCustomException {
         if (!tradeHelper.getTradeInfoValidator().validate(this))
             throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_INFO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_INFO_INVALID.getType());
 
+        // check if the execution of trade will not break the app logic i.e not selling more than what you have, etc
         Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().upsertUserSecurity(this);
 
         if (tradeExecutionPossible.equals(Boolean.FALSE))
             throw new FatalCustomException(FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getCustomMessage(), FatalErrorCode.ERR0R_TRADE_EXECUTION_INVALID.getType());
 
         Integer currentTime = tradeHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
-        
+
+        // create a trade object and persist in DB as a log
         this.createdAt = currentTime;
         this.updatedAt = currentTime;
         this.deletedAt = 0;
         this.tradeId = (Long) tradeHelper.getTradeRepository().add(this);
+
+        logger.info("Trade for security id {} added to the system with trade id {} for type {} for quantity {} and price {} ",
+                this.security.securityId, this.tradeId, this.tradeType, this.quantity, this.price);
     }
 
     public void updateTrade(TradeHelper tradeHelper) throws FatalCustomException {
@@ -115,6 +128,8 @@ public class Trade {
         if (Objects.isNull(tradeFromDB))
             throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_ID_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_ID_INVALID.getType());
 
+        // check if the execution of the updated trade will not break the app logic i.e not selling more than what you have, reverting th previous trades,
+        // what if some other trades were executed in the meantime and the quantity is not what is expected, etc
         Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().updateUserSecurity(this, tradeFromDB);
 
         if (tradeExecutionPossible.equals(Boolean.FALSE))
@@ -125,7 +140,11 @@ public class Trade {
         this.deletedAt = 0;
         this.security = tradeFromDB.getSecurity();
 
+        // update the trade object and persist in DB
         tradeHelper.getTradeRepository().update(this);
+
+        logger.info("Trade for security id {} added to the system with trade id {} for type {} for quantity {} and price {} ",
+                this.security.securityId, this.tradeId, this.tradeType, this.quantity, this.price);
     }
 
     public void deleteTrade(TradeHelper tradeHelper) throws FatalCustomException {
@@ -137,6 +156,7 @@ public class Trade {
         if (Objects.isNull(tradeFromDB))
             throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_ID_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_ID_INVALID.getType());
 
+        // check if the execution of the updated trade will not break the app logic
         Boolean tradeExecutionPossible = tradeHelper.getUserSecurityService().deleteTradeSecurity(tradeFromDB);
 
         if (tradeExecutionPossible.equals(Boolean.FALSE))
@@ -149,6 +169,9 @@ public class Trade {
         this.createdAt = tradeFromDB.getCreatedAt();
         this.security = tradeFromDB.getSecurity();
 
+        // soft delete the trade
         tradeHelper.getTradeRepository().update(this);
+        logger.info("Trade for security id {} deleted from the system with trade id {} for type {} for quantity {} and price {} ",
+                this.security.securityId, this.tradeId, this.tradeType, this.quantity, this.price);
     }
 }

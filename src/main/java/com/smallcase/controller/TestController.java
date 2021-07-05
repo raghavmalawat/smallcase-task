@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class TestController {
-    // TODO : Add Comments
-    // TODO : Prepare a documentation
-
     @ApiOperation(value = "Service Health Check")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = "application/json")

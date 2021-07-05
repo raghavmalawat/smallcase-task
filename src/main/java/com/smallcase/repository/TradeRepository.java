@@ -1,8 +1,10 @@
 package com.smallcase.repository;
 
+import com.smallcase.LogFactory;
 import com.smallcase.database.postgres.dao.TradeDao;
 import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.domainentity.Trade;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 @Service
 public class TradeRepository implements DomainPersistence<Trade> {
 
+    private static final Logger logger = LogFactory.getLogger(TradeRepository.class);
+
     @Autowired
     TradeDao tradeDao;
 
@@ -23,6 +27,10 @@ public class TradeRepository implements DomainPersistence<Trade> {
     public Object add(Trade trade) {
         TradeEntity tradeEntity = convertTradeToTradeEntity(trade);
         TradeEntity tradeEntityFromDB =  tradeDao.save(tradeEntity);
+
+        if (Objects.nonNull(tradeEntityFromDB.getId()))
+            logger.info("Successfully saved trade entry in DB");
+
         return tradeEntityFromDB.getId();
     }
 
@@ -40,7 +48,10 @@ public class TradeRepository implements DomainPersistence<Trade> {
     @Override
     public void update(Trade trade) {
         TradeEntity tradeEntity = convertTradeToTradeEntity(trade);
-        tradeDao.save(tradeEntity);
+        TradeEntity tradeEntityFromDB = tradeDao.save(tradeEntity);
+
+        if (Objects.nonNull(tradeEntityFromDB.getId()))
+            logger.info("Successfully saved trade entry in DB");
     }
 
     @Override
@@ -57,6 +68,7 @@ public class TradeRepository implements DomainPersistence<Trade> {
         if (Objects.nonNull(tradesFromDB))
             filteredResult = tradesFromDB.stream().map(Trade::new).collect(Collectors.toList());
 
+        logger.info("Successfully fetched trades from DB");
         return filteredResult;
     }
 

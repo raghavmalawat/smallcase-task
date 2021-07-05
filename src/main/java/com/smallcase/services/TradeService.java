@@ -6,6 +6,7 @@ import com.smallcase.dto.TradeDTO;
 import com.smallcase.dto.TradeInfo;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
+import com.smallcase.helpers.TradeHelper;
 import com.smallcase.transformer.TradeDTOToTradeTransformer;
 import com.smallcase.transformer.TradeToFetchTradeResponseTransformer;
 import com.smallcase.transformer.TradeToTradeDTOTransformer;
@@ -33,8 +34,13 @@ public class TradeService {
     @Autowired
     TradeHelper tradeHelper;
 
+    /**
+     * @param tradeDTO contains the details of the trade that needs to be executed
+     * @return the added trade to the system
+     */
     public TradeDTO createTradeRecords(TradeDTO tradeDTO) {
         try {
+            // validate if the trade has valid values like quantity and price
             if (!tradeHelper.getTradeDTOValidator().validate(tradeDTO))
                 throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_DTO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_DTO_INVALID.getType());
 
@@ -43,6 +49,7 @@ public class TradeService {
 
                 if (CollectionUtils.isNotEmpty(tradeList)) {
                     for (Trade trade : tradeList) {
+                        // add trades to the system
                         trade.addTrade(tradeHelper);
                     }
                 }
@@ -60,14 +67,21 @@ public class TradeService {
         }
     }
 
+    /**
+     * @param userId signifies for which user the trades has to be retrieved (relevant for fetching all trades for a user)
+     * @param tradeIds is used to filter and fetch trades if tradeIds are given
+     * @return the list of all the requested trades
+     */
     public FetchTradeResponse getTradeRecords(Long userId, List<Long> tradeIds) {
         List<Trade> tradeList = new ArrayList<>();
 
         if (Objects.nonNull(tradeIds) && tradeIds.size() == 1) {
+            // if a single trade is requested by tradeId
             Trade trade = new Trade(TradeInfo.builder().tradeId(tradeIds.get(0)).build(), userId, null);
             trade = tradeHelper.getTradeRepository().get(trade);
             tradeList.add(trade);
         } else {
+            // in case of fetching multiple trades
             List<TradeInfo> tradeInfoList = new ArrayList<>();
             if (Objects.nonNull(tradeIds))
                 tradeInfoList = tradeIds.stream().map(u -> TradeInfo.builder().tradeId(u).build()).collect(Collectors.toList());
@@ -89,8 +103,13 @@ public class TradeService {
         return response;
     }
 
+    /**
+     * @param tradeDTO contains the updated trade order that needs to be persisted
+     * @return the snapshot of the updated trade
+     */
     public TradeDTO updateTradeRecord(TradeDTO tradeDTO) {
         try {
+            // validations performed to see if the request is healthy
             if (!tradeHelper.getTradeDTOValidator().validate(tradeDTO))
                 throw new FatalCustomException(FatalErrorCode.ERROR_TRADE_DTO_INVALID.getCustomMessage(), FatalErrorCode.ERROR_TRADE_DTO_INVALID.getType());
             if (CollectionUtils.isNotEmpty(tradeDTO.getTrades())) {
@@ -98,7 +117,7 @@ public class TradeService {
 
                 if (CollectionUtils.isNotEmpty(tradeList)) {
                     for (Trade trade : tradeList)
-                        trade.updateTrade(tradeHelper);
+                        trade.updateTrade(tradeHelper); // updating trades
                 }
                 TradeDTO response = tradeToTradeDTOTransformer.transformObject(tradeList);
                 response.setSuccess(Boolean.TRUE);
@@ -114,6 +133,10 @@ public class TradeService {
         }
     }
 
+    /**
+     * @param tradeDTO deletes the trades requested, reverting back the security holdings and returns
+     * @return a snapshot of the deleted trade
+     */
     public TradeDTO deleteTradeRecord(TradeDTO tradeDTO) {
         try {
            if (CollectionUtils.isNotEmpty(tradeDTO.getTrades())) {
@@ -121,7 +144,7 @@ public class TradeService {
 
                 if (CollectionUtils.isNotEmpty(tradeList)) {
                     for (Trade trade : tradeList)
-                        trade.deleteTrade(tradeHelper);
+                        trade.deleteTrade(tradeHelper); // deleting a trade
                 }
                 TradeDTO response = tradeToTradeDTOTransformer.transformObject(tradeList);
                 response.setSuccess(Boolean.TRUE);

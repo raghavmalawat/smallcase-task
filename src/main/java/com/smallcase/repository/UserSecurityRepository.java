@@ -1,11 +1,11 @@
 package com.smallcase.repository;
 
+import com.smallcase.LogFactory;
 import com.smallcase.database.postgres.dao.UserSecurityDao;
-import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.database.postgres.entity.UserSecurityEntity;
-import com.smallcase.domainentity.Trade;
 import com.smallcase.domainentity.UserSecurity;
 import com.smallcase.enums.Status;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserSecurityRepository implements DomainPersistence<UserSecurity> {
 
+    private static final Logger logger = LogFactory.getLogger(UserSecurityRepository.class);
+
     @Autowired
     UserSecurityDao userSecurityDao;
 
@@ -26,6 +28,10 @@ public class UserSecurityRepository implements DomainPersistence<UserSecurity> {
     public Object add(UserSecurity userSecurity) {
         UserSecurityEntity userSecurityEntity = convertUserSecurityToUserSecurityEntity(userSecurity);
         UserSecurityEntity userSecurityEntityFromDB = userSecurityDao.save(userSecurityEntity);
+
+        if (Objects.nonNull(userSecurityEntityFromDB.getId()))
+            logger.info("Successfully saved user security holding in DB");
+
         return userSecurityEntityFromDB.getId();
     }
 
@@ -44,7 +50,10 @@ public class UserSecurityRepository implements DomainPersistence<UserSecurity> {
     @Override
     public void update(UserSecurity userSecurity) {
         UserSecurityEntity userSecurityEntity = convertUserSecurityToUserSecurityEntity(userSecurity);
-        userSecurityDao.save(userSecurityEntity);
+        UserSecurityEntity userSecurityEntityFromDB = userSecurityDao.save(userSecurityEntity);
+
+        if (Objects.nonNull(userSecurityEntityFromDB.getId()))
+            logger.info("Successfully saved user security holding in DB");
     }
 
     @Override
@@ -58,6 +67,7 @@ public class UserSecurityRepository implements DomainPersistence<UserSecurity> {
         if (Objects.nonNull(userSecuritiesFromDB))
             filteredResult = userSecuritiesFromDB.stream().map(UserSecurity::new).collect(Collectors.toList());
 
+        logger.info("Successfully fetched user securities holdings from DB");
         return filteredResult;
     }
 

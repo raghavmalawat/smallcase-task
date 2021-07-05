@@ -1,11 +1,16 @@
 package com.smallcase.domainentity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
+import com.smallcase.LogFactory;
+import com.smallcase.database.postgres.entity.SecurityEntity;
 import com.smallcase.enums.SecurityType;
+import com.smallcase.helpers.SecurityHelper;
 import lombok.*;
+import org.apache.logging.log4j.Logger;
 
 import javax.validation.constraints.NotNull;
 
@@ -20,7 +25,6 @@ public class Security {
 
     @JsonProperty("security_id")
     @SerializedName("security_id")
-    @NotNull
     Long securityId;
 
     @JsonProperty("security_type")
@@ -28,4 +32,58 @@ public class Security {
     @NotNull
     SecurityType securityType;
 
+    @JsonProperty("name")
+    @SerializedName("name")
+    @NotNull
+    String securityName;
+
+    @JsonProperty("ticker_symbol")
+    @SerializedName("ticker_symbol")
+    @NotNull
+    String tickerSymbol;
+
+    @JsonIgnore
+    Integer deletedAt;
+
+    @JsonIgnore
+    Integer createdAt;
+
+    @JsonIgnore
+    Integer updatedAt;
+
+    private static final Logger logger = LogFactory.getLogger(Security.class);
+
+    public Security(Long securityId, SecurityType securityType) {
+        this.securityId = securityId;
+        this.securityType = securityType;
+    }
+
+    public Security(Long securityId) {
+        this.securityId = securityId;
+    }
+
+    public Security(SecurityEntity securityEntity) {
+        // convert the security object obtained from DB to the domain object
+
+        this.securityId = securityEntity.getId();
+        this.securityType = SecurityType.getEnum(securityEntity.getSecurityType());
+        this.securityName = securityEntity.getName();
+        this.tickerSymbol = securityEntity.getTickerSymbol();
+        this.createdAt = securityEntity.getCreatedAt();
+        this.deletedAt = securityEntity.getDeletedAt();
+        this.updatedAt = securityEntity.getUpdatedAt();
+
+        logger.info("security object from DB: {} for id {}", this, this.securityId);
+    }
+
+    public void addSecurity(SecurityHelper securityHelper) {
+        // create a new security object and add to the system
+        Integer currentTime = securityHelper.getDateTimeUtils().getIntCurrentTimeInSeconds();
+
+        this.createdAt = currentTime;
+        this.updatedAt = currentTime;
+        this.deletedAt = 0;
+        this.securityId = (Long) securityHelper.getSecurityRepository().add(this);
+        logger.info("security with ticker symbol {} added to the system with id {}", this.tickerSymbol, this.securityId);
+    }
 }
