@@ -24,7 +24,10 @@ public class SecurityController {
     @PostMapping(produces = "application/json")
     public SecurityDTO addSecurities(@RequestBody SecurityDTO securityDTO) {
         try {
-            return securityService.addSecurity(securityDTO);
+            logger.info("Add security request : {}", securityDTO);
+            SecurityDTO response = securityService.addSecurity(securityDTO);
+            logger.info("Add security response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in adding a new security: {}", ExceptionUtils.getStackTrace(e));
             return SecurityDTO.builder().message("Error").success(false).build();
@@ -35,7 +38,10 @@ public class SecurityController {
     @GetMapping(produces = "application/json")
     public SecurityDTO getSecurities(@RequestParam(value = "securityIds", required = false) List<Long> securityIds) {
         try {
-            return securityService.getSecurities(securityIds);
+            logger.info("Retrieve securities request securityIds: {}", securityIds);
+            SecurityDTO response = securityService.getSecurities(securityIds);
+            logger.info("Fetch securities response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in retrieving all securities: {}", ExceptionUtils.getStackTrace(e));
             return SecurityDTO.builder().message("Error").success(false).build();

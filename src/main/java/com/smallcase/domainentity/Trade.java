@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
+import com.smallcase.LogFactory;
 import com.smallcase.database.postgres.entity.TradeEntity;
 import com.smallcase.dto.TradeInfo;
 import com.smallcase.enums.SecurityType;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.logging.log4j.Logger;
 
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -66,6 +68,8 @@ public class Trade {
     @JsonIgnore
     Integer updatedAt;
 
+    private static final Logger logger = LogFactory.getLogger(Trade.class);
+
     public Trade(TradeInfo trade, Long userId, Security security) {
         this.security = security;
         this.userId = userId;
@@ -89,6 +93,8 @@ public class Trade {
         this.createdAt = tradeEntity.getCreatedAt();
         this.deletedAt = tradeEntity.getDeletedAt();
         this.updatedAt = tradeEntity.getUpdatedAt();
+
+        logger.info("Trade object from DB: {}", this);
     }
 
     public void addTrade(TradeHelper tradeHelper) throws FatalCustomException {
@@ -108,6 +114,9 @@ public class Trade {
         this.updatedAt = currentTime;
         this.deletedAt = 0;
         this.tradeId = (Long) tradeHelper.getTradeRepository().add(this);
+
+        logger.info("Trade for security id {} added to the system with trade id {} for type {} for quantity {} and price {} ",
+                this.security.securityId, this.tradeId, this.tradeType, this.quantity, this.price);
     }
 
     public void updateTrade(TradeHelper tradeHelper) throws FatalCustomException {
@@ -133,6 +142,9 @@ public class Trade {
 
         // update the trade object and persist in DB
         tradeHelper.getTradeRepository().update(this);
+
+        logger.info("Trade for security id {} added to the system with trade id {} for type {} for quantity {} and price {} ",
+                this.security.securityId, this.tradeId, this.tradeType, this.quantity, this.price);
     }
 
     public void deleteTrade(TradeHelper tradeHelper) throws FatalCustomException {
@@ -159,5 +171,7 @@ public class Trade {
 
         // soft delete the trade
         tradeHelper.getTradeRepository().update(this);
+        logger.info("Trade for security id {} deleted from the system with trade id {} for type {} for quantity {} and price {} ",
+                this.security.securityId, this.tradeId, this.tradeType, this.quantity, this.price);
     }
 }

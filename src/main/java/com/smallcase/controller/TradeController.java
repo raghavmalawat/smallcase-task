@@ -25,7 +25,10 @@ public class TradeController {
     @PostMapping(produces = "application/json")
     public TradeDTO createTrade(@RequestBody TradeDTO tradeDTO) {
         try {
-            return tradeService.createTradeRecords(tradeDTO);
+            logger.info("Create trade request : {}", tradeDTO);
+            TradeDTO response = tradeService.createTradeRecords(tradeDTO);
+            logger.info("Create trade response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in creating a new trade entry: {}", ExceptionUtils.getStackTrace(e));
             return TradeDTO.builder().message("Error").success(false).build();
@@ -37,7 +40,10 @@ public class TradeController {
     public FetchTradeResponse getTrades(@RequestParam(value = "userId") Long userId,
                                         @RequestParam(value = "tradeIds", required = false) List<Long> tradeIds) {
         try {
-            return tradeService.getTradeRecords(userId, tradeIds);
+            logger.info("Retrieve trade request userId: {}, tradeIds: {}", userId, tradeIds);
+            FetchTradeResponse response = tradeService.getTradeRecords(userId, tradeIds);
+            logger.info("Retrieve trades response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in retrieving trade entries: {}", ExceptionUtils.getStackTrace(e));
             return FetchTradeResponse.builder().message("Error").success(false).build();
@@ -48,7 +54,10 @@ public class TradeController {
     @PutMapping(produces = "application/json")
     public TradeDTO updateTrade(@RequestBody TradeDTO tradeDTO) {
         try {
-            return tradeService.updateTradeRecord(tradeDTO);
+            logger.info("Update trade request : {}", tradeDTO);
+            TradeDTO response = tradeService.updateTradeRecord(tradeDTO);
+            logger.info("Update trade response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in updating a trade entry: {}", ExceptionUtils.getStackTrace(e));
             return TradeDTO.builder().message("Error").success(false).build();
@@ -59,7 +68,10 @@ public class TradeController {
     @DeleteMapping(produces = "application/json")
     public TradeDTO deleteTrade(@RequestBody TradeDTO tradeDTO) {
         try {
-            return tradeService.deleteTradeRecord(tradeDTO);
+            logger.info("Delete trade request : {}", tradeDTO);
+            TradeDTO response = tradeService.deleteTradeRecord(tradeDTO);
+            logger.info("Delete trade response : {}", response);
+            return response;
         } catch (Exception e) {
             logger.error("Error in deleting a new entry: {}", ExceptionUtils.getStackTrace(e));
             return TradeDTO.builder().message("Error").success(false).build();

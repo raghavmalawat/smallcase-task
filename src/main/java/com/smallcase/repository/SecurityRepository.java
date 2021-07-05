@@ -1,8 +1,10 @@
 package com.smallcase.repository;
 
+import com.smallcase.LogFactory;
 import com.smallcase.database.postgres.dao.SecurityDao;
 import com.smallcase.database.postgres.entity.SecurityEntity;
 import com.smallcase.domainentity.Security;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 @Service
 public class SecurityRepository implements DomainPersistence<Security>  {
 
+    private static final Logger logger = LogFactory.getLogger(SecurityRepository.class);
+
     @Autowired
     SecurityDao securityDao;
 
@@ -22,6 +26,10 @@ public class SecurityRepository implements DomainPersistence<Security>  {
     public Object add(Security security) {
         SecurityEntity securityEntity = convertSecurityToSecurityEntity(security);
         SecurityEntity securityEntityFromDB = securityDao.save(securityEntity);
+
+        if (Objects.nonNull(securityEntityFromDB.getId()))
+            logger.info("Successfully saved security in DB");
+
         return securityEntityFromDB.getId();
     }
 
@@ -54,6 +62,7 @@ public class SecurityRepository implements DomainPersistence<Security>  {
         if (Objects.nonNull(securitiesFromDB))
             filteredResult = securitiesFromDB.stream().map(Security::new).collect(Collectors.toList());
 
+        logger.info("Successfully fetched securities from DB");
         return filteredResult;
     }
 
