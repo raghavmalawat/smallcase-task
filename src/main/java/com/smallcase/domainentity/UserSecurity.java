@@ -10,14 +10,20 @@ import com.smallcase.database.postgres.entity.UserSecurityEntity;
 import com.smallcase.enums.SecurityType;
 import com.smallcase.enums.Status;
 import com.smallcase.exception.FatalCustomException;
+import com.smallcase.helpers.SecurityHelper;
 import com.smallcase.helpers.UserSecurityHelper;
+import com.smallcase.utils.WebUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -67,6 +73,12 @@ public class UserSecurity {
     @JsonIgnore
     Integer updatedAt;
 
+    @Autowired
+    WebUtil webUtil;
+
+    @Autowired
+    SecurityHelper securityHelper;
+
     private static final Logger logger = LogFactory.getLogger(UserSecurity.class);
 
     public UserSecurity(Trade trade) {
@@ -79,6 +91,10 @@ public class UserSecurity {
         // convert the user security object obtained from DB to the domain object
 
         Security security1 = new Security(userSecurityEntity.getSecurityId(), SecurityType.getEnum(userSecurityEntity.getSecurityType()));
+
+        List<Security> securityFromDB =  securityHelper.getSecurityRepository().bulkGet(null, Collections.singletonList(security1));
+
+        security1 = securityFromDB.get(0);
 
         this.userId = userSecurityEntity.getUserId();
         this.userSecurityId = userSecurityEntity.getId();
@@ -137,6 +153,11 @@ public class UserSecurity {
 
     public void getSecurityReturns(UserSecurityHelper userSecurityHelper) {
         // calculate the returns for a particular security considering a fixed current price at the moment
+        String tickerSymbol = this.security.tickerSymbol;
+        Object currentPrice =  webUtil.getCurrentPrice(Collections.singletonList(tickerSymbol));
+
+        // Get current price and calculate the value
+
         this.cumulativeReturns = (userSecurityHelper.getCurrentPrice() - this.averagePrice) * this.currentQuantity;
     }
 }

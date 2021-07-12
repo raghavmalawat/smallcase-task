@@ -9,6 +9,7 @@ import com.smallcase.enums.TradeAction;
 import com.smallcase.enums.TradeType;
 import com.smallcase.exception.FatalCustomException;
 import com.smallcase.exception.FatalErrorCode;
+import com.smallcase.helpers.SecurityHelper;
 import com.smallcase.helpers.UserSecurityHelper;
 import com.smallcase.transformer.UserSecurityToUserSecurityDTOTransformer;
 import org.apache.commons.collections.CollectionUtils;
@@ -28,6 +29,9 @@ public class UserSecurityService {
 
     @Autowired
     UserSecurityHelper userSecurityHelper;
+
+    @Autowired
+    SecurityHelper securityHelper;
 
     /**
      * @param trade will take the decision if the user is buying a security for the first time or already
