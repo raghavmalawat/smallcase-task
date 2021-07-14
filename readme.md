@@ -1,6 +1,7 @@
 Link to the not so good documentation: https://docs.google.com/document/d/17wu03oIcfyo2645-lDjtw8LRM7n4ZS9XQCaAuJd2AhE/edit?usp=sharing
 
 Swagger: https://smallcase-task-raghav.herokuapp.com/smallcase-core/swagger-ui.html#/
+
 Postman Collection: https://www.getpostman.com/collections/858cf81cd5734ecfc066
 
 Heroku BaseUrl : http://smallcase-task-raghav.herokuapp.com/smallcase-core/  (Service Health Check API)
